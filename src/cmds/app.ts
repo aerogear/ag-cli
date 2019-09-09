@@ -1,18 +1,14 @@
-import * as yargs from 'yargs';
+import { Argv } from 'yargs';
 
-import { Command, publish } from './commands';
+import { CliCommand, publish } from './command-interface';
 
-class AppCommand implements Command {
-    public name : string = 'app';
-    public desc : string = 'Create an empty repo';
-    public builder(argv) {
-        // tslint:disable-next-line: no-unused-expression
-        yargs
-            .commandDir('app-cmds')
-            .demandCommand()
-            .argv;
-    }
-    public handler(argv) {}
+class AppCommand implements CliCommand {
+  public name: string = 'app';
+  public desc: string = 'Create an empty repo';
+  public builder(yargs: Argv) {
+    // tslint:disable-next-line: no-unused-expression
+    yargs.commandDir('app-cmds').demandCommand().argv;
+  }
 }
 
 publish(new AppCommand(), module);
