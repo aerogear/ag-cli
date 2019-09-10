@@ -1,0 +1,5 @@
+name: "ag"
+shortDesc: "aerogear mobile cli plugin"
+longDesc: "aerogear mobile cli plugin to manage mdc resources and interactions"
+example: ""
+command: "kubectl-ag"
