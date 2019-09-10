@@ -25,10 +25,14 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tslint -t stylish --project \"tsconfig.json\""
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "build": "tsc"
   },
   "author": "mziccard@redhat.com",
   "license": "Apache-2.0",
+  "bin": {
+    "kubectl-ag": "./lib/index.js"
+  },
   "engines": {
     "node": "12.10.0"
   }
