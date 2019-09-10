@@ -2,16 +2,16 @@ import { Argv } from 'yargs';
 
 import { CommandInterface, expose } from './command-interface';
 
-class AppCommand implements CommandInterface {
-  public name: string = 'app';
-  public desc: string = 'Manages applications';
+class ServiceCommand implements CommandInterface {
+  public name: string = 'service';
+  public desc: string = 'Handles mobile services';
   public builder(yargs: Argv) {
     // tslint:disable-next-line: no-unused-expression
     return yargs
-      .commandDir('app-cmds')
+      .commandDir('service-cmds')
       .demandCommand()
       .help();
   }
 }
 
-expose(new AppCommand(), module);
+expose(new ServiceCommand(), module);

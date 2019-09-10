@@ -1,12 +1,22 @@
-import { Argv } from 'yargs';
-import { CliCommand, publish } from '../command-interface';
+import { Arguments, Argv } from 'yargs';
+import { AbstractNamespaceScopedCommand, expose } from '../command-interface';
 
-class AppInitCommand implements CliCommand {
-  public name: string = 'init';
-  public desc: string = 'Initialize a new app';
-  public handler(yargs: Argv) {
+class AppInitCommand extends AbstractNamespaceScopedCommand {
+  constructor() {
+    super('init <name>', 'Initialize a new app');
+  }
+
+  protected initCli(yargs: Argv): Argv {
+    return yargs.positional('name', {
+      describe: 'the name of the app to be created',
+      type: 'string',
+    });
+  }
+
+  public handler(yargs: Arguments) {
+    //TODO: add here the real code
     console.log('app init called');
   }
 }
 
-publish(new AppInitCommand(), module);
+expose(new AppInitCommand(), module);
