@@ -8,7 +8,9 @@ class ServiceCommand implements CommandInterface {
   public builder(yargs: Argv) {
     // tslint:disable-next-line: no-unused-expression
     return yargs
-      .commandDir('service-cmds')
+      .commandDir('service-cmds', {
+        exclude: /.*test\.js$/
+      })
       .demandCommand()
       .help();
   }

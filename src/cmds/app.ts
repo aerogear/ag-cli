@@ -8,7 +8,9 @@ class AppCommand implements CommandInterface {
   public builder(yargs: Argv) {
     // tslint:disable-next-line: no-unused-expression
     return yargs
-      .commandDir('app-cmds')
+      .commandDir('app-cmds', {
+        exclude: /.*test\.js$/
+      })
       .demandCommand()
       .help();
   }
