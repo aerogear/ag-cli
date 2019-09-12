@@ -1,6 +1,9 @@
 import { Arguments } from 'yargs';
 import { AbstractNamespaceScopedCommand, expose } from '../command-interface';
 
+/**
+ * This class implements the 'app list' command, whose role is to list all the applications in a specified namespace.
+ */
 class AppListCommand extends AbstractNamespaceScopedCommand {
   constructor() {
     super(

@@ -18,7 +18,7 @@
     "no-suspicious-comment": false,
     "interface-name": false,
     "prefer-object-spread": false,
-    "prefer-readonly": false,
+    "prefer-readonly": true,
     "no-unsafe-any": false,
     "strict-boolean-expressions": false,
     "typedef": [

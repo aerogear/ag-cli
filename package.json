@@ -6,12 +6,19 @@
   "dependencies": {
     "chalk": "2.4.2",
     "figlet": "1.2.4",
+    "fs-extra": "^8.1.0",
+    "inquirer": "^7.0.0",
+    "kubernetes-client": "^8.3.4",
+    "uuid": "^3.3.3",
     "yargs": "14.0.0"
   },
   "devDependencies": {
     "@types/chalk": "0.4.31",
+    "@types/fs-extra": "^8.0.0",
+    "@types/inquirer": "^6.5.0",
     "@types/jest": "^24.0.18",
     "@types/node": "12.7.4",
+    "@types/uuid": "^3.4.5",
     "@types/yargs": "13.0.2",
     "jest": "^24.9.0",
     "lint-staged": "9.2.5",

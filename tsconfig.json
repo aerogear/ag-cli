@@ -16,12 +16,14 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
+    "resolveJsonModule": true,
     "lib": [
       "esnext"
     ]
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./src/**/*.json"
   ],
   "exclude": [
     "node_modules"

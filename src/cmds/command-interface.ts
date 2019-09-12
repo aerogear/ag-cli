@@ -56,8 +56,7 @@ export abstract class AbstractNamespaceScopedCommand extends AbstractCommand {
         alias: 'n',
         type: 'string',
         describe: 'namespace',
-        default: 'mobile-developer-console',
-        demand: true,
+        nargs: 1,
       })
       .help();
   }

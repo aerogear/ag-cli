@@ -1,6 +1,9 @@
 import { Arguments } from 'yargs';
 import { AbstractCommand, expose } from '../command-interface';
 
+/**
+ * Class implementing the 'service delete' command, whose role is to remove the specified 'service binding' from the app.
+ */
 class ServiceDeleteCommand extends AbstractCommand {
   constructor() {
     super(
