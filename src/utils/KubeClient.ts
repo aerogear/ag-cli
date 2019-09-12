@@ -13,19 +13,21 @@ const mobileSecurityService = require('../model/crds/mobile-security-crd.json');
  * Kubernetes client wrapper.
  * This class is a singleton that will expose a simplified interface to access aerogear openshift cluster.
  */
-export class KubeClient {
+export abstract class KubeClient {
   private static instance: KubeClient;
 
-  private readonly kube: any;
-  private readonly kubeConfig: KubeConfig;
+  protected kube: any;
+  protected readonly kubeConfig: KubeConfig;
 
-  private constructor(kube: any) {
-    this.kube = kube;
+  protected constructor() {
     this.kubeConfig = new KubeConfig();
     this.kubeConfig.loadFromDefault();
   }
 
-  private static async initKubeClient() {
+  private async initKubeClient() {
+    if (this.kube) {
+      return;
+    }
     const kubeconfig = new KubeConfig();
     if (process.env.NODE_ENV === 'production') {
       kubeconfig.loadFromCluster();
@@ -45,21 +47,21 @@ export class KubeClient {
     kubeclient.addCustomResourceDefinition(androidVariantCRD);
     kubeclient.addCustomResourceDefinition(iosVariantCRD);
     kubeclient.addCustomResourceDefinition(mobileSecurityService);
-    return kubeclient;
+    this.kube = kubeclient;
   }
 
   /**
    * Returns a singleton instance of this object.
    */
   // tslint:disable-next-line: function-name
-  public static async getInstance(): Promise<KubeClient> {
+  public static getInstance(): KubeClient {
     if (!KubeClient.instance) {
-      KubeClient.instance = new KubeClient(await KubeClient.initKubeClient());
+      KubeClient.instance = new ConcreteKubeClient();
     }
     return KubeClient.instance;
   }
 
-  private getCurrentNamespace(): string {
+  public getCurrentNamespace(): string {
     const context: string = this.kubeConfig.getCurrentContext();
     if (context && context.includes('/')) {
       return context.split('/', 1)[0];
@@ -77,12 +79,33 @@ export class KubeClient {
     app: MobileApp,
     namespace: string = this.getCurrentNamespace(),
   ): Promise<void> {
+    await this.initKubeClient();
+    return this._push(app, namespace);
+  }
+
+  protected abstract _push(app: MobileApp, namespace: string): Promise<void>;
+}
+
+/**
+ * Concrete implementation of the KubeClient
+ */
+class ConcreteKubeClient extends KubeClient {
+
+  /**
+   * Pushes an application definition to the cluster.
+   * @param app the application to be pushed
+   * @param namespace the namespace where the application must be pushed (defaults to the current namespace)
+   */
+  protected async _push(
+    app: MobileApp,
+    namespace: string = this.getCurrentNamespace(),
+  ): Promise<void> {
     const kc = new KubeConfig();
     kc.loadFromDefault();
     await this.kube.apis['mdc.aerogear.org'].v1alpha1
       .namespace(namespace)
       .mobileclient.post({
-        body: app.toJson(),
+        body: app.namespace(namespace).toJson(),
       });
   }
 }

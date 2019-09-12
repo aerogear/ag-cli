@@ -21,6 +21,7 @@
     "prefer-readonly": true,
     "no-unsafe-any": false,
     "strict-boolean-expressions": false,
+    "function-name": false,
     "typedef": [
       true,
       "parameter",

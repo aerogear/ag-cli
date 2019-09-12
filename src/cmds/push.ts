@@ -8,7 +8,9 @@ import { WORKSPACE } from '../global';
  * This class implements the 'push' command, whose role is to push local changes to the server.
  */
 class PushCommand extends AbstractNamespaceScopedCommand {
-  private workspaceMgr: WorkspaceManager = new WorkspaceManager(WORKSPACE);
+  private readonly workspaceMgr: WorkspaceManager = new WorkspaceManager(
+    WORKSPACE,
+  );
 
   constructor() {
     super('push', 'Pushes all local resources in .ag folder into a namespace');

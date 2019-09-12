@@ -72,6 +72,6 @@ export class WorkspaceManager {
     const appJson = fsExtra.readJSONSync(
       `${this.path}/${appName ? appName + '.json' : 'mobileapp.json'}`,
     );
-    return new MobileApp(appJson.metadata.name);
+    return new MobileApp(appJson.metadata.name, appJson.status.namespace);
   }
 }

@@ -5,6 +5,7 @@ import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
 import { WorkspaceManager } from '../../utils/WorkspaceManager';
+import {KubeClient} from "../../utils/KubeClient";
 
 /**
  * This class implements the 'app init <appname>' command.
@@ -55,7 +56,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     try {
       this.workspaceMgr.init(true);
       this.workspaceMgr.save(
-        new MobileApp(yargs.name as string),
+        new MobileApp(yargs.name as string, KubeClient.getInstance().getCurrentNamespace()),
         'mobileapp.json',
       );
       console.log(`New application "${yargs.name}" initialised`);
