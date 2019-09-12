@@ -1,5 +1,6 @@
 import * as fsExtra from 'fs-extra';
 import { SerializableInterface } from '../model/SerializableInterface';
+import { MobileApp } from '../model/MobileApp';
 
 /**
  * This class is responsible of managin the workspace folder.
@@ -56,17 +57,21 @@ export class WorkspaceManager {
    * @param outputfile
    */
   public save(object: SerializableInterface, outputfile: string): void {
+    const fileName = outputfile || object.getName() + '.json';
     try {
-      fsExtra.outputJsonSync(
-        `${this.path}/${outputfile || object.getName()}`,
-        object.toJson(),
-      );
+      fsExtra.outputJsonSync(`${this.path}/${fileName}`, object.toJson());
     } catch (e) {
       throw {
-        message:
-          'Unable to save application into `${WORKSPACE}/mobileapp.json`',
+        message: `Unable to save application into ${this.path}/${fileName}`,
         root: e,
       };
     }
+  }
+
+  public loadApplication(appName?: string): MobileApp {
+    const appJson = fsExtra.readJSONSync(
+      `${this.path}/${appName ? appName + '.json' : 'mobileapp.json'}`,
+    );
+    return new MobileApp(appJson.metadata.name);
   }
 }

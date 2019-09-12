@@ -34,23 +34,6 @@ export class MobileApp implements SerializableInterface {
     return this.name;
   }
 
-  static LOAD(): MobileApp {
-    const appJson = fsExtra.readJSONSync(`${WORKSPACE}/mobileapp.json`);
-    return new MobileApp(appJson.metadata.name);
-  }
-
-  static SAVE(app: MobileApp): void {
-    try {
-      fsExtra.outputJsonSync(`${WORKSPACE}/mobileapp.json`, app.toJson());
-    } catch (e) {
-      throw {
-        message:
-          'Unable to save application into `${WORKSPACE}/mobileapp.json`',
-        root: e,
-      };
-    }
-  }
-
   toJson(): MobileAppCrd {
     return {
       apiVersion: 'mdc.aerogear.org/v1alpha1',
