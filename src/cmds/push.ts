@@ -13,31 +13,26 @@ const mobileSecurityService = require('../model/crds/mobile-security-crd.json');
 const { Client } = require('kubernetes-client');
 
 async function initKubeClient() {
-  try {
-    const kubeconfig = new KubeConfig();
-    if (process.env.NODE_ENV === 'production') {
-      kubeconfig.loadFromCluster();
-    } else {
-      kubeconfig.loadFromDefault();
-    }
-    const backend = new Request({ kubeconfig });
-
-    if (process.env.INSECURE_SERVER) {
-      backend.requestOptions.strictSSL = false;
-    }
-
-    const kubeclient = new Client({ backend });
-    await kubeclient.loadSpec();
-    kubeclient.addCustomResourceDefinition(mobileClientCRD);
-    kubeclient.addCustomResourceDefinition(pushApplicationCRD);
-    kubeclient.addCustomResourceDefinition(androidVariantCRD);
-    kubeclient.addCustomResourceDefinition(iosVariantCRD);
-    kubeclient.addCustomResourceDefinition(mobileSecurityService);
-    return kubeclient;
-  } catch (e) {
-    console.error('Failed to init kube client', e);
-    return null;
+  const kubeconfig = new KubeConfig();
+  if (process.env.NODE_ENV === 'production') {
+    kubeconfig.loadFromCluster();
+  } else {
+    kubeconfig.loadFromDefault();
   }
+  const backend = new Request({ kubeconfig });
+
+  if (process.env.INSECURE_SERVER) {
+    backend.requestOptions.strictSSL = false;
+  }
+
+  const kubeclient = new Client({ backend });
+  await kubeclient.loadSpec();
+  kubeclient.addCustomResourceDefinition(mobileClientCRD);
+  kubeclient.addCustomResourceDefinition(pushApplicationCRD);
+  kubeclient.addCustomResourceDefinition(androidVariantCRD);
+  kubeclient.addCustomResourceDefinition(iosVariantCRD);
+  kubeclient.addCustomResourceDefinition(mobileSecurityService);
+  return kubeclient;
 }
 
 /**

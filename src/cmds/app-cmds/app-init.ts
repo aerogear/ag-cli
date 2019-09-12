@@ -1,16 +1,20 @@
 import { Arguments, Argv } from 'yargs';
 import { AbstractNamespaceScopedCommand, expose } from '../command-interface';
 import { WORKSPACE } from '../../global';
-import * as fsExtra from 'fs-extra';
 import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
+import { WorkspaceManager } from '../../utils/WorkspaceManager';
 
 /**
  * This class implements the 'app init <appname>' command.
  * Its role is to create a new workspace initialised with the specified application name, so that it can be later pushed to the cluster.
  */
 class AppInitCommand extends AbstractNamespaceScopedCommand {
+  private readonly workspaceMgr: WorkspaceManager = new WorkspaceManager(
+    WORKSPACE,
+  );
+
   constructor() {
     super('init <name>', 'Initialize a new app');
   }
@@ -30,38 +34,8 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
       });
   }
 
-  private wipeOutWorkspace(): void {
-    try {
-      fsExtra.removeSync(WORKSPACE);
-    } catch (e) {
-      console.error(`Unable to delete the workspace folder (${WORKSPACE})`, e);
-      process.exit(1);
-    }
-  }
-
-  private createWorkspaceFolder(): void {
-    try {
-      fsExtra.mkdir(WORKSPACE);
-    } catch (e) {
-      throw {
-        message: `Unable to create the workspace folder (${WORKSPACE})`,
-        root: e,
-      };
-    }
-  }
-
-  private initWorkspace(appName: string): void {
-    try {
-      this.createWorkspaceFolder();
-      MobileApp.SAVE(new MobileApp(appName));
-    } catch (e) {
-      console.error(e.message);
-      process.exit(1);
-    }
-  }
-
   public handler = async (yargs: Arguments): Promise<void> => {
-    if (fsExtra.existsSync(WORKSPACE)) {
+    if (this.workspaceMgr.exists()) {
       if (!yargs.force) {
         const answers: Answers = await inquirer.prompt([
           {
@@ -76,10 +50,18 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
           process.exit(1);
         }
       }
-      this.wipeOutWorkspace();
     }
-    this.initWorkspace(yargs.name as string);
-    console.log(`New application "${yargs.name}" initialised`);
+
+    try {
+      this.workspaceMgr.init(true);
+      this.workspaceMgr.save(
+        new MobileApp(yargs.name as string),
+        'mobileapp.json',
+      );
+      console.log(`New application "${yargs.name}" initialised`);
+    } catch (e) {
+      console.error('Failed initializing the workspace: ', e.message);
+    }
   };
 }
 

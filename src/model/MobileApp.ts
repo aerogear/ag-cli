@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { WORKSPACE } from '../global';
+import { SerializableInterface } from './SerializableInterface';
 import * as fsExtra from 'fs-extra';
 
 /**
@@ -21,7 +22,7 @@ interface MobileAppCrd {
  * Object representation of a mobile application.
  * This class is used to load and save mobile application JSON files so that they are ready to be pushed to the server.
  */
-export class MobileApp {
+export class MobileApp implements SerializableInterface {
   private readonly name: string;
   private readonly apikey: string;
   constructor(name: string) {
