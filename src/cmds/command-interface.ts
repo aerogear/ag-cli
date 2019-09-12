@@ -1,4 +1,7 @@
 import { Argv, Arguments } from 'yargs';
+import * as ora from 'ora';
+import { WorkspaceManager } from '../utils/WorkspaceManager';
+import { WORKSPACE } from '../global';
 
 /**
  * Interface to be implemented by all the commands.
@@ -33,6 +36,10 @@ export interface CommandInterface {
 export abstract class AbstractCommand implements CommandInterface {
   readonly name: string;
   readonly desc: string;
+  protected spinner: any = ora();
+  protected readonly workspace: WorkspaceManager = new WorkspaceManager(
+    WORKSPACE,
+  );
 
   constructor(name: string, desc: string) {
     this.name = name;

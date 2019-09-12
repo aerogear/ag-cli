@@ -4,20 +4,15 @@ import { WORKSPACE } from '../../global';
 import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
-import { WorkspaceManager } from '../../utils/WorkspaceManager';
-import {KubeClient} from "../../utils/KubeClient";
+import { KubeClient } from '../../utils/KubeClient';
 
 /**
  * This class implements the 'app init <appname>' command.
  * Its role is to create a new workspace initialised with the specified application name, so that it can be later pushed to the cluster.
  */
 class AppInitCommand extends AbstractNamespaceScopedCommand {
-  private readonly workspaceMgr: WorkspaceManager = new WorkspaceManager(
-    WORKSPACE,
-  );
-
   constructor() {
-    super('init <name>', 'Initialize a new app');
+    super('init <name>', 'Initialise a new app');
   }
 
   protected initCli(yargs: Argv): Argv {
@@ -36,7 +31,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {
-    if (this.workspaceMgr.exists()) {
+    if (this.workspace.exists()) {
       if (!yargs.force) {
         const answers: Answers = await inquirer.prompt([
           {
@@ -54,14 +49,17 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     }
 
     try {
-      this.workspaceMgr.init(true);
-      this.workspaceMgr.save(
-        new MobileApp(yargs.name as string, KubeClient.getInstance().getCurrentNamespace()),
+      this.workspace.init(true);
+      this.workspace.save(
+        new MobileApp(
+          yargs.name as string,
+          KubeClient.getInstance().getCurrentNamespace(),
+        ),
         'mobileapp.json',
       );
-      console.log(`New application "${yargs.name}" initialised`);
+      this.spinner.succeed(`New application "${yargs.name}" initialised`);
     } catch (e) {
-      console.error('Failed initializing the workspace: ', e.message);
+      this.spinner.fail(`Failed initializing the workspace: ${e.message}`);
     }
   };
 }

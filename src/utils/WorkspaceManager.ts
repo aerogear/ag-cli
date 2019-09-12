@@ -7,6 +7,7 @@ import { MobileApp } from '../model/MobileApp';
  */
 export class WorkspaceManager {
   private readonly path: string;
+
   constructor(workspacepath: string) {
     this.path = workspacepath;
   }

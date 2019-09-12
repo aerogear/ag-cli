@@ -9,6 +9,7 @@
     "fs-extra": "8.1.0",
     "inquirer": "7.0.0",
     "kubernetes-client": "8.3.4",
+    "ora": "3.4.0",
     "uuid": "3.3.3",
     "yargs": "14.0.0"
   },

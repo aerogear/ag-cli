@@ -90,7 +90,6 @@ export abstract class KubeClient {
  * Concrete implementation of the KubeClient
  */
 class ConcreteKubeClient extends KubeClient {
-
   /**
    * Pushes an application definition to the cluster.
    * @param app the application to be pushed
