@@ -1,15 +1,17 @@
 import * as fsExtra from 'fs-extra';
 import { SerializableInterface } from '../model/SerializableInterface';
 import { MobileApp } from '../model/MobileApp';
+import Log, { LogHandler } from './Log';
 
 /**
  * This class is responsible of managin the workspace folder.
  */
 export class WorkspaceManager {
   private readonly path: string;
-
-  constructor(workspacepath: string) {
+  public readonly logHandler: LogHandler;
+  constructor(workspacepath: string, logHandler?: LogHandler) {
     this.path = workspacepath;
+    this.logHandler = logHandler;
   }
 
   /**
@@ -19,12 +21,19 @@ export class WorkspaceManager {
     return fsExtra.existsSync(this.path);
   }
 
+  @Log({
+    pre: 'Wiping out current workspace',
+    post: 'Workspace wiped out',
+    fail: 'Failed wiping the workspace: %s',
+  })
   private wipeOutWorkspace(): void {
     try {
       fsExtra.removeSync(this.path);
     } catch (e) {
-      console.error(`Unable to delete the workspace folder (${this.path})`, e);
-      process.exit(1);
+      throw {
+        message: `Unable to create the workspace folder (${this.path})`,
+        root: e,
+      };
     }
   }
 
@@ -43,6 +52,11 @@ export class WorkspaceManager {
    * Initialises the workspace.
    * @param overwrite if true, silently overwrite an existing workspace. If false, don't do anything if already exists.
    */
+  @Log({
+    pre: 'Initializing the workspace',
+    post: 'New workspace initialised',
+    fail: 'Failed initialising the workspace: %s',
+  })
   public init(overwrite: boolean = false) {
     if (overwrite && this.exists()) {
       this.wipeOutWorkspace();
@@ -69,6 +83,11 @@ export class WorkspaceManager {
     }
   }
 
+  @Log({
+    pre: 'Loading application from the workspace',
+    post: 'Application loaded',
+    fail: 'Failed loading application from the workspace: %s',
+  })
   public loadApplication(appName?: string): MobileApp {
     const appJson = fsExtra.readJSONSync(
       `${this.path}/${appName ? appName + '.json' : 'mobileapp.json'}`,

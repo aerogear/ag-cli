@@ -5,6 +5,7 @@ import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
 import { KubeClient } from '../../utils/KubeClient';
+import { Log } from '../../utils/Log';
 
 /**
  * This class implements the 'app init <appname>' command.
@@ -13,9 +14,10 @@ import { KubeClient } from '../../utils/KubeClient';
 class AppInitCommand extends AbstractNamespaceScopedCommand {
   constructor() {
     super('init <name>', 'Initialise a new app');
+    this.handler = this.handler.bind(this);
   }
 
-  protected initCli(yargs: Argv): Argv {
+  protected initCli(yargs: Argv): Argv<any> {
     return yargs
       .positional('name', {
         describe: 'the name of the app to be created',
@@ -30,7 +32,20 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
       });
   }
 
-  public handler = async (yargs: Arguments): Promise<void> => {
+  @Log({
+    pre: 'Creating new application',
+    post: 'Application created successfully',
+    fail: 'Failed creating the application: %s',
+  })
+  private createApp(name: string): void {
+    this.workspace.init(true);
+    this.workspace.save(
+      new MobileApp(name, KubeClient.getInstance().getCurrentNamespace()),
+      'mobileapp.json',
+    );
+  }
+
+  public async handler(yargs: Arguments): Promise<void> {
     if (this.workspace.exists()) {
       if (!yargs.force) {
         const answers: Answers = await inquirer.prompt([
@@ -48,20 +63,8 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
       }
     }
 
-    try {
-      this.workspace.init(true);
-      this.workspace.save(
-        new MobileApp(
-          yargs.name as string,
-          KubeClient.getInstance().getCurrentNamespace(),
-        ),
-        'mobileapp.json',
-      );
-      this.spinner.succeed(`New application "${yargs.name}" initialised`);
-    } catch (e) {
-      this.spinner.fail(`Failed initializing the workspace: ${e.message}`);
-    }
-  };
+    this.createApp(yargs.name as string);
+  }
 }
 
 expose(new AppInitCommand(), module);

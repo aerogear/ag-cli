@@ -1,7 +1,9 @@
+import * as util from 'util';
 import { Argv, Arguments } from 'yargs';
 import * as ora from 'ora';
 import { WorkspaceManager } from '../utils/WorkspaceManager';
 import { WORKSPACE } from '../global';
+import { LogHandler } from '../utils/Log';
 
 /**
  * Interface to be implemented by all the commands.
@@ -30,20 +32,41 @@ export interface CommandInterface {
   builder?(yargs: Argv): Argv;
 }
 
+class LogHandlerImpl implements LogHandler {
+  private readonly spinner: any;
+
+  constructor(spinner: any) {
+    this.spinner = spinner;
+  }
+
+  pre = (msg: string): void => this.spinner.start(msg);
+  post = (msg: string): void => this.spinner.succeed(msg);
+  fail = (msg: string, error: Error, swallow: boolean = false): void => {
+    // check if the exception has already been logged: if it is, the spinner is stopped.
+    if (this.spinner.isSpinning) {
+      this.spinner.fail(util.format(msg, error.message));
+    }
+    if (!swallow) {
+      throw error;
+    }
+  };
+}
+
 /**
  * Base class for commands.
  */
 export abstract class AbstractCommand implements CommandInterface {
+  private readonly logHandler: LogHandler;
   readonly name: string;
   readonly desc: string;
   protected spinner: any = ora();
-  protected readonly workspace: WorkspaceManager = new WorkspaceManager(
-    WORKSPACE,
-  );
+  protected readonly workspace: WorkspaceManager;
 
   constructor(name: string, desc: string) {
     this.name = name;
     this.desc = desc;
+    this.logHandler = new LogHandlerImpl(this.spinner);
+    this.workspace = new WorkspaceManager(WORKSPACE, this.logHandler);
   }
 }
 
@@ -57,7 +80,7 @@ export abstract class AbstractNamespaceScopedCommand extends AbstractCommand {
    */
   protected initCli?(yargs: Argv): Argv;
 
-  private initYargs(yargs: Argv): Argv {
+  private initYargs(yargs: Argv): Argv<any> {
     return yargs
       .option('namespace', {
         alias: 'n',
