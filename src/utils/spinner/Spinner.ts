@@ -1,24 +1,28 @@
+import * as util from 'util';
+import * as ora from 'ora';
+import { Ora } from 'ora';
+
 /**
  * A log handler will receive the messages and will log them accordingly.
  * - pre: this is the message that will be logged before the method execution
  * - post: this is the message that will be logged if the method execution was successful
  * - fail: this is the message that will be logged if the method execution failed
  */
-export interface LogHandler {
+interface SpinnerHandler {
   /**
-   * Log before method execution
+   * Spinner before method execution
    * @param msg
    */
   pre(msg: string): void;
 
   /**
-   * Log when method execution is successful
+   * Spinner when method execution is successful
    * @param msg
    */
   post(msg: string): void;
 
   /**
-   * Log when method execution is failed.
+   * Spinner when method execution is failed.
    * @param msg
    * @param error The error
    * @param swallow if false, rethrow the error, otherwise swallow it
@@ -29,20 +33,41 @@ export interface LogHandler {
 /**
  * Interface for log messages
  */
-export interface LogMessages {
+export interface SpinnerMessage {
   pre: string;
   post: string;
   fail: string;
   swallow?: boolean;
 }
 
-/**
- * This logger is a black hole: it swallows all the messages he receives.
- */
-class NullLogHandler implements LogHandler {
-  pre(msg: string): void {}
-  post(msg: string): void {}
-  fail(msg: string, error: Error): void {}
+class SpinnerImpl implements SpinnerHandler {
+  private static INSTANCE: SpinnerImpl;
+
+  private readonly spinner: Ora = ora();
+  private constructor() {}
+
+  public static getInstance() {
+    if (!this.INSTANCE) {
+      this.INSTANCE = new SpinnerImpl();
+    }
+    return this.INSTANCE;
+  }
+
+  pre = (msg: string): void => {
+    this.spinner.start(msg);
+  };
+  post = (msg: string): void => {
+    this.spinner.succeed(msg);
+  };
+  fail = (msg: string, error: Error, swallow: boolean = false): void => {
+    // check if the exception has already been logged: if it is, the spinner is stopped.
+    if (this.spinner.isSpinning) {
+      this.spinner.fail(util.format(msg, error.message));
+    }
+    if (!swallow) {
+      throw error;
+    }
+  };
 }
 
 /**
@@ -53,7 +78,7 @@ class NullLogHandler implements LogHandler {
  * @param swallow weather to rethrow the error or not
  * @constructor
  */
-export function Log({ pre, post, fail, swallow }: LogMessages) {
+export function Spinner({ pre, post, fail, swallow }: SpinnerMessage) {
   return (
     target: Object,
     key: string,
@@ -61,7 +86,7 @@ export function Log({ pre, post, fail, swallow }: LogMessages) {
   ) => {
     const originalMethod = descriptor.value;
     descriptor.value = function(...args: any[]) {
-      const logHandler: LogHandler = this.logHandler || new NullLogHandler();
+      const logHandler: SpinnerHandler = SpinnerImpl.getInstance();
       try {
         logHandler.pre(pre);
         const ret = originalMethod.apply(this, args);
@@ -84,7 +109,7 @@ export function Log({ pre, post, fail, swallow }: LogMessages) {
  * @param swallow weather to rethrow the error or not
  * @constructor
  */
-export function LogAsync({ pre, post, fail, swallow }: LogMessages) {
+export function SpinnerAsync({ pre, post, fail, swallow }: SpinnerMessage) {
   return (
     target: Object,
     key: string,
@@ -92,7 +117,7 @@ export function LogAsync({ pre, post, fail, swallow }: LogMessages) {
   ) => {
     const originalMethod = descriptor.value;
     descriptor.value = async function(...args: any[]) {
-      const logHandler: LogHandler = this.logHandler || new NullLogHandler();
+      const logHandler: SpinnerHandler = SpinnerImpl.getInstance();
       try {
         logHandler.pre(pre);
         const ret = await originalMethod.apply(this, args);
@@ -106,4 +131,4 @@ export function LogAsync({ pre, post, fail, swallow }: LogMessages) {
     return descriptor;
   };
 }
-export default Log;
+export default Spinner;

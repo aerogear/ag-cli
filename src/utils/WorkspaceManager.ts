@@ -1,17 +1,15 @@
 import * as fsExtra from 'fs-extra';
 import { SerializableInterface } from '../model/SerializableInterface';
 import { MobileApp } from '../model/MobileApp';
-import Log, { LogHandler } from './Log';
+import { Spinner } from './spinner';
 
 /**
  * This class is responsible of managin the workspace folder.
  */
 export class WorkspaceManager {
   private readonly path: string;
-  public readonly logHandler: LogHandler;
-  constructor(workspacepath: string, logHandler?: LogHandler) {
+  constructor(workspacepath: string) {
     this.path = workspacepath;
-    this.logHandler = logHandler;
   }
 
   /**
@@ -21,7 +19,7 @@ export class WorkspaceManager {
     return fsExtra.existsSync(this.path);
   }
 
-  @Log({
+  @Spinner({
     pre: 'Wiping out current workspace',
     post: 'Workspace wiped out',
     fail: 'Failed wiping the workspace: %s',
@@ -52,7 +50,7 @@ export class WorkspaceManager {
    * Initialises the workspace.
    * @param overwrite if true, silently overwrite an existing workspace. If false, don't do anything if already exists.
    */
-  @Log({
+  @Spinner({
     pre: 'Initializing the workspace',
     post: 'New workspace initialised',
     fail: 'Failed initialising the workspace: %s',
@@ -83,7 +81,7 @@ export class WorkspaceManager {
     }
   }
 
-  @Log({
+  @Spinner({
     pre: 'Loading application from the workspace',
     post: 'Application loaded',
     fail: 'Failed loading application from the workspace: %s',

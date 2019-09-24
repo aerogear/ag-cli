@@ -5,7 +5,7 @@ import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
 import { KubeClient } from '../../utils/KubeClient';
-import { Log } from '../../utils/Log';
+import { Spinner } from '../../utils/spinner';
 
 /**
  * This class implements the 'app init <appname>' command.
@@ -32,7 +32,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
       });
   }
 
-  @Log({
+  @Spinner({
     pre: 'Creating new application',
     post: 'Application created successfully',
     fail: 'Failed creating the application: %s',
