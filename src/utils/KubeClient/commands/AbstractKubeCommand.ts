@@ -17,5 +17,7 @@ export abstract class AbstractKubeCommand implements KubeCommand {
     return context;
   }
 
+  protected getKubeConfig = () => this.kubeConfig;
+
   abstract async execute(kube: any): Promise<any>;
 }
