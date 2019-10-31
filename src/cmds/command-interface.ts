@@ -1,4 +1,7 @@
 import { Argv, Arguments } from 'yargs';
+import { WorkspaceManager } from '../utils/WorkspaceManager';
+import { WORKSPACE } from '../global';
+import Module = NodeJS.Module;
 
 /**
  * Interface to be implemented by all the commands.
@@ -33,10 +36,12 @@ export interface CommandInterface {
 export abstract class AbstractCommand implements CommandInterface {
   readonly name: string;
   readonly desc: string;
+  protected readonly workspace: WorkspaceManager;
 
-  constructor(name: string, desc: string) {
+  protected constructor(name: string, desc: string) {
     this.name = name;
     this.desc = desc;
+    this.workspace = new WorkspaceManager(WORKSPACE);
   }
 }
 
@@ -50,14 +55,13 @@ export abstract class AbstractNamespaceScopedCommand extends AbstractCommand {
    */
   protected initCli?(yargs: Argv): Argv;
 
-  private initYargs(yargs: Argv): Argv {
+  private initYargs(yargs: Argv): Argv<any> {
     return yargs
       .option('namespace', {
         alias: 'n',
         type: 'string',
         describe: 'namespace',
-        default: 'mobile-developer-console',
-        demand: true,
+        nargs: 1,
       })
       .help();
   }
@@ -76,8 +80,7 @@ export abstract class AbstractNamespaceScopedCommand extends AbstractCommand {
  * @param cliCommand - the command to be exposed
  * @param commandModule - the module containing the command
  */
-// tslint:disable-next-line: no-any
-export function expose(cliCommand: CommandInterface, commandModule: any) {
+export function expose(cliCommand: CommandInterface, commandModule: Module) {
   commandModule.exports.command = cliCommand.name;
   commandModule.exports.desc = cliCommand.desc;
 

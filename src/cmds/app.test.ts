@@ -1,3 +1,6 @@
+/**
+ * 'app' command tests.
+ */
 import * as yargs from 'yargs';
 import { Arguments } from 'yargs';
 

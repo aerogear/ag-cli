@@ -5,8 +5,12 @@ PLUGIN_FOLDER = ${HOME}/.kube/plugins/ag
 clean:
 	@rm -rf lib/*
 
+.PHONY: install-deps
+install-deps:
+	@npm install
+
 .PHONY: build
-build:
+build: install-deps
 	@npm run build
 
 .PHONY: test
@@ -22,4 +26,4 @@ install: build test
 .PHONY: uninstall
 uninstall:
 	@npm uninstall -g
-	@rm -f ${PLUGIN_FOLDER}/plugin.yaml
+	@rm -rf ${PLUGIN_FOLDER}

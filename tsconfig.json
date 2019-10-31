@@ -4,6 +4,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "importHelpers": true,
     "alwaysStrict": false,
     "sourceMap": true,
@@ -16,12 +17,14 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
+    "resolveJsonModule": true,
     "lib": [
       "esnext"
     ]
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./src/**/*.json"
   ],
   "exclude": [
     "node_modules"
