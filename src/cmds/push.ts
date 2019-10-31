@@ -23,7 +23,6 @@ class PushCommand extends AbstractNamespaceScopedCommand {
     namespace: string,
   ): Promise<void> {
     const cl: KubeClient = await KubeClient.getInstance();
-    //await cl.push(mobileApp, namespace);
     await cl.execute(new AppPushCommand(mobileApp, namespace));
   }
 

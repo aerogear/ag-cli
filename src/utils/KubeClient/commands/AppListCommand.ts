@@ -12,7 +12,6 @@ export class AppListCommand extends AbstractKubeCommand {
     const result = await kube.apis['mdc.aerogear.org'].v1alpha1
       .namespace(this.namespace)
       .mobileclients.get();
-    // TODO: check that status is 200
     return result.body.items;
   }
 }

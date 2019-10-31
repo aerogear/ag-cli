@@ -9,10 +9,10 @@ class ServiceListCommand extends AbstractCommand {
   constructor() {
     super('list', 'List all available mobile services');
   }
-  public handler(yargs: Arguments) {
+  public handler = async (yargs: Arguments) => {
     //TODO: add here the real code
     console.log('service list called - namespace:', yargs.namespace);
-  }
+  };
 }
 
 expose(new ServiceListCommand(), module);
