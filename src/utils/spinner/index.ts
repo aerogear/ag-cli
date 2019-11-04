@@ -1,1 +1,1 @@
-export { Spinner, SpinnerAsync } from './Spinner';
+export { Spinner } from './Spinner';

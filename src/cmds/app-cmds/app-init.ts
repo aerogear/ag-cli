@@ -27,7 +27,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
         alias: 'f',
         type: 'boolean',
         describe:
-          'if specified, no confirmation will be asked before overwriting existing fails',
+          'if specified, no confirmation will be asked before overwriting existing files',
         nargs: 0,
       });
   }
