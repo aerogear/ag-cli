@@ -11,10 +11,10 @@ class ServiceDeleteCommand extends AbstractCommand {
       'Deletes a service binding from a mobile client using the local mobile client resource as reference.',
     );
   }
-  public handler(yargs: Arguments) {
+  public handler = async (yargs: Arguments) => {
     //TODO: add here the real code
     console.log('service delete called - namespace:', yargs.namespace);
-  }
+  };
 }
 
 expose(new ServiceDeleteCommand(), module);

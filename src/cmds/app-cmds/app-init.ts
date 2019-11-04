@@ -45,7 +45,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     );
   }
 
-  public async handler(yargs: Arguments): Promise<void> {
+  public handler = async (yargs: Arguments): Promise<void> => {
     if (this.workspace.exists()) {
       if (!yargs.force) {
         const answers: Answers = await inquirer.prompt([
@@ -64,7 +64,7 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     }
 
     this.createApp(yargs.name as string);
-  }
+  };
 }
 
 expose(new AppInitCommand(), module);

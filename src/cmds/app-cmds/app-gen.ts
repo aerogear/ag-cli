@@ -8,10 +8,10 @@ class AppGenCommand extends AbstractCommand {
   constructor() {
     super('gen', 'Generates/updates the mobile-services.json file');
   }
-  public handler(yargs: Arguments) {
+  public handler = async (yargs: Arguments) => {
     //TODO: add here the real code
     console.log('app gen called');
-  }
+  };
 }
 
 expose(new AppGenCommand(), module);

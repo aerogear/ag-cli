@@ -43,6 +43,17 @@ export abstract class AbstractCommand implements CommandInterface {
     this.desc = desc;
     this.workspace = new WorkspaceManager(WORKSPACE);
   }
+
+  protected safeHandler = async (yargs: Arguments): Promise<void> => {};
+
+  public handler = async (yargs: Arguments): Promise<void> => {
+    try {
+      return await this.safeHandler(yargs);
+    } catch (error) {
+      console.error(`An error has occurred: ${error.message}`);
+    }
+    return;
+  };
 }
 
 /**

@@ -29,7 +29,7 @@ export class WorkspaceManager {
       fsExtra.removeSync(this.path);
     } catch (e) {
       throw {
-        message: `Unable to create the workspace folder (${this.path})`,
+        message: `Unable to wipe out the workspace folder (${this.path})`,
         root: e,
       };
     }

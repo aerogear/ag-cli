@@ -1,19 +1,23 @@
 import { KubeConfig } from '@kubernetes/client-node';
 import * as Request from 'kubernetes-client/backends/request';
-import { MobileApp } from '../model/MobileApp';
+import { MobileApp } from '../../model/MobileApp';
 const { Client } = require('kubernetes-client');
 
-const mobileClientCRD = require('../model/crds/mobile-client-crd.json');
-const pushApplicationCRD = require('../model/crds/push-application-crd.json');
-const androidVariantCRD = require('../model/crds/android-variant-crd.json');
-const iosVariantCRD = require('../model/crds/ios-variant-crd.json');
-const mobileSecurityService = require('../model/crds/mobile-security-crd.json');
+const mobileClientCRD = require('../../model/crds/mobile-client-crd.json');
+const pushApplicationCRD = require('../../model/crds/push-application-crd.json');
+const androidVariantCRD = require('../../model/crds/android-variant-crd.json');
+const iosVariantCRD = require('../../model/crds/ios-variant-crd.json');
+const mobileSecurityService = require('../../model/crds/mobile-security-crd.json');
+
+export interface KubeCommand {
+  execute(kube: KubeClient): any;
+}
 
 /**
  * Kubernetes client wrapper.
  * This class is a singleton that will expose a simplified interface to access aerogear openshift cluster.
  */
-export abstract class KubeClient {
+export class KubeClient {
   private static instance: KubeClient;
 
   protected kube: any;
@@ -56,7 +60,7 @@ export abstract class KubeClient {
   // tslint:disable-next-line: function-name
   public static getInstance(): KubeClient {
     if (!KubeClient.instance) {
-      KubeClient.instance = new ConcreteKubeClient();
+      KubeClient.instance = new KubeClient();
     }
     return KubeClient.instance;
   }
@@ -70,41 +74,39 @@ export abstract class KubeClient {
     return context;
   }
 
-  /**
-   * Pushes an application definition to the cluster.
-   * @param app the application to be pushed
-   * @param namespace the namespace where the application must be pushed (defaults to the current namespace)
-   */
-  public async push(
-    app: MobileApp,
-    namespace: string = this.getCurrentNamespace(),
-  ): Promise<void> {
+  public async execute(command: KubeCommand): Promise<any> {
     await this.initKubeClient();
-    return this._push(app, namespace);
+    return await command.execute(this.kube);
   }
-
-  protected abstract _push(app: MobileApp, namespace: string): Promise<void>;
 }
 
-/**
- * Concrete implementation of the KubeClient
- */
-class ConcreteKubeClient extends KubeClient {
-  /**
-   * Pushes an application definition to the cluster.
-   * @param app the application to be pushed
-   * @param namespace the namespace where the application must be pushed (defaults to the current namespace)
-   */
-  protected async _push(
-    app: MobileApp,
-    namespace: string = this.getCurrentNamespace(),
-  ): Promise<void> {
+export class PushCommand implements KubeCommand {
+  private readonly app: MobileApp;
+  private readonly namespace: string;
+  private readonly kubeConfig: KubeConfig = new KubeConfig();
+
+  constructor(app: MobileApp, namespace: string) {
+    this.kubeConfig.loadFromDefault();
+    this.app = app;
+    this.namespace = namespace || this.getCurrentNamespace();
+  }
+
+  public getCurrentNamespace(): string {
+    const context: string = this.kubeConfig.getCurrentContext();
+    if (context && context.includes('/')) {
+      return context.split('/', 1)[0];
+    }
+
+    return context;
+  }
+
+  async execute(kube: any): Promise<any> {
     const kc = new KubeConfig();
     kc.loadFromDefault();
-    await this.kube.apis['mdc.aerogear.org'].v1alpha1
-      .namespace(namespace)
+    return await kube.apis['mdc.aerogear.org'].v1alpha1
+      .namespace(this.namespace)
       .mobileclient.post({
-        body: app.namespace(namespace).toJson(),
+        body: this.app.namespace(this.namespace).toJson(),
       });
   }
 }

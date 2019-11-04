@@ -1,6 +1,6 @@
 import { AbstractNamespaceScopedCommand, expose } from './command-interface';
 import { Arguments } from 'yargs';
-import { KubeClient } from '../utils/KubeClient';
+import { KubeClient, AppPushCommand } from '../utils/KubeClient';
 import { MobileApp } from '../model/MobileApp';
 import { SpinnerAsync } from '../utils/spinner';
 
@@ -23,7 +23,7 @@ class PushCommand extends AbstractNamespaceScopedCommand {
     namespace: string,
   ): Promise<void> {
     const cl: KubeClient = await KubeClient.getInstance();
-    await cl.push(mobileApp, namespace);
+    await cl.execute(new AppPushCommand(mobileApp, namespace));
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {
