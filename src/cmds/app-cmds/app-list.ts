@@ -25,11 +25,11 @@ class AppListCommand extends AbstractNamespaceScopedCommand {
       );
 
       const table = new Table({
-        head: ['REMOTE/LOCAL', 'NAMESPACE', 'APP NAME'],
+        head: ['APP NAME', 'NAMESPACE'],
       });
 
       appList.forEach((app: any) =>
-        table.push(['R', app.metadata.namespace, app.metadata.name]),
+        table.push([app.metadata.name, app.metadata.namespace]),
       );
       console.log(table.toString());
     } catch (error) {
