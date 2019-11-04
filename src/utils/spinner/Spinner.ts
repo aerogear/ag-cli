@@ -90,45 +90,20 @@ export function Spinner({ pre, post, fail, swallow }: SpinnerMessage) {
       try {
         logHandler.pre(pre);
         const ret = originalMethod.apply(this, args);
+        if (ret && ret.then) {
+          // it is a promise
+          return ret
+            .then((value: any) => logHandler.post(post))
+            .catch((error: Error) => logHandler.fail(fail, error, !!swallow));
+        }
         logHandler.post(post);
         return ret;
       } catch (error) {
         logHandler.fail(fail, error, !!swallow);
       }
     };
-
     return descriptor;
   };
 }
 
-/**
- * Automatically logs a function execution. Function must be async.
- * @param pre Message logged before executing the method
- * @param post Message logged after executing the method (if successful)
- * @param fail Message logged after executing the method (if failed)
- * @param swallow weather to rethrow the error or not
- * @constructor
- */
-export function SpinnerAsync({ pre, post, fail, swallow }: SpinnerMessage) {
-  return (
-    target: Object,
-    key: string,
-    descriptor: TypedPropertyDescriptor<any>,
-  ) => {
-    const originalMethod = descriptor.value;
-    descriptor.value = async function(...args: any[]) {
-      const logHandler: SpinnerHandler = SpinnerImpl.getInstance();
-      try {
-        logHandler.pre(pre);
-        const ret = await originalMethod.apply(this, args);
-        logHandler.post(post);
-        return ret;
-      } catch (error) {
-        logHandler.fail(fail, error, !!swallow);
-      }
-    };
-
-    return descriptor;
-  };
-}
 export default Spinner;
