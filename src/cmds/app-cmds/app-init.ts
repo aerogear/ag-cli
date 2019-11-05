@@ -37,33 +37,32 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     post: 'Application created successfully',
     fail: 'Failed creating the application: %s',
   })
-  private createApp(name: string): void {
-    this.workspace.init(true);
-    this.workspace.save(
+  private async createApp(name: string): Promise<void> {
+    //this.workspace.init(true);
+    await this.workspace.save(
       new MobileApp(name, KubeClient.getInstance().getCurrentNamespace()),
-      'mobileapp.json',
     );
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {
-    if (this.workspace.exists()) {
-      if (!yargs.force) {
-        const answers: Answers = await inquirer.prompt([
-          {
-            name: 'wipeWorkspace',
-            type: 'confirm',
-            message: `Workspace folder (${WORKSPACE}) already exists. Continuing will wipe that out. Continue ?`,
-            default: false,
-          },
-        ]);
+    // if (this.workspace.exists()) {
+    //   if (!yargs.force) {
+    //     const answers: Answers = await inquirer.prompt([
+    //       {
+    //         name: 'wipeWorkspace',
+    //         type: 'confirm',
+    //         message: `Workspace folder (${WORKSPACE}) already exists. Continuing will wipe that out. Continue ?`,
+    //         default: false,
+    //       },
+    //     ]);
+    //
+    //     if (!answers.wipeWorkspace) {
+    //       process.exit(1);
+    //     }
+    //   }
+    // }
 
-        if (!answers.wipeWorkspace) {
-          process.exit(1);
-        }
-      }
-    }
-
-    this.createApp(yargs.name as string);
+    await this.createApp(yargs.name as string);
   };
 }
 

@@ -1,5 +1,4 @@
 import * as fsExtra from 'fs-extra';
-import { SerializableInterface } from '../model/SerializableInterface';
 import { MobileApp } from '../model/MobileApp';
 import { Spinner } from './spinner';
 
@@ -66,13 +65,16 @@ export class WorkspaceManager {
 
   /**
    * Saves an object into the workspace.
-   * @param object
-   * @param outputfile
+   * @param app
    */
-  public save(object: SerializableInterface, outputfile: string): void {
-    const fileName = outputfile || object.getName() + '.json';
+  public async save(app: MobileApp): Promise<void> {
+    const fileName = app.getName() + '.json';
     try {
-      fsExtra.outputJsonSync(`${this.path}/${fileName}`, object.toJson());
+      await fsExtra.mkdirp(`${this.path}/${app.getNameSpace()}`);
+      await fsExtra.outputJson(
+        `${this.path}/${app.getNameSpace()}/${fileName}`,
+        app.toJson(),
+      );
     } catch (e) {
       throw {
         message: `Unable to save application into ${this.path}/${fileName}`,
@@ -86,9 +88,12 @@ export class WorkspaceManager {
     post: 'Application loaded',
     fail: 'Failed loading application from the workspace: %s',
   })
-  public loadApplication(appName?: string): MobileApp {
-    const appJson = fsExtra.readJSONSync(
-      `${this.path}/${appName ? appName + '.json' : 'mobileapp.json'}`,
+  public async loadApplication(
+    namespace: string,
+    appName: string,
+  ): Promise<MobileApp> {
+    const appJson = await fsExtra.readJSON(
+      `${this.path}/${namespace}/${appName}.json`,
     );
     return new MobileApp(appJson.metadata.name, appJson.status.namespace);
   }

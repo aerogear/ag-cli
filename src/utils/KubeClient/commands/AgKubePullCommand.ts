@@ -1,0 +1,22 @@
+import { AbstractKubeCommand } from './AbstractKubeCommand';
+import { MobileApp } from '../../../model/MobileApp';
+
+export class AgKubePullCommand extends AbstractKubeCommand {
+  private readonly app: string;
+  private readonly namespace: string;
+
+  constructor(appname: string, namespace: string) {
+    super();
+    this.app = appname;
+    this.namespace = namespace || this.getCurrentNamespace();
+  }
+
+  execute = async (kube: any): Promise<any> => {
+    console.log('pulling3', { name: this.app, namespace: this.namespace });
+
+    return await kube.apis['mdc.aerogear.org'].v1alpha1
+      .namespace(this.namespace)
+      .mobileclient(this.app)
+      .get();
+  };
+}
