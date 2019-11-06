@@ -1,6 +1,5 @@
 import { Arguments, Argv } from 'yargs';
 import { AbstractNamespaceScopedCommand, expose } from '../command-interface';
-import { WORKSPACE } from '../../global';
 import * as inquirer from 'inquirer';
 import { Answers } from 'inquirer';
 import { MobileApp } from '../../model/MobileApp';
@@ -37,32 +36,34 @@ class AppInitCommand extends AbstractNamespaceScopedCommand {
     post: 'Application created successfully',
     fail: 'Failed creating the application: %s',
   })
-  private async createApp(name: string): Promise<void> {
-    //this.workspace.init(true);
-    await this.workspace.save(
-      new MobileApp(name, KubeClient.getInstance().getCurrentNamespace()),
-    );
+  private async createApp(namespace: string, name: string): Promise<void> {
+    await this.workspace.save(new MobileApp(name, namespace));
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {
-    // if (this.workspace.exists()) {
-    //   if (!yargs.force) {
-    //     const answers: Answers = await inquirer.prompt([
-    //       {
-    //         name: 'wipeWorkspace',
-    //         type: 'confirm',
-    //         message: `Workspace folder (${WORKSPACE}) already exists. Continuing will wipe that out. Continue ?`,
-    //         default: false,
-    //       },
-    //     ]);
-    //
-    //     if (!answers.wipeWorkspace) {
-    //       process.exit(1);
-    //     }
-    //   }
-    // }
+    const name: string = yargs.name as string;
+    const namespace: string =
+      (yargs.namespace as string) ||
+      KubeClient.getInstance().getCurrentNamespace();
 
-    await this.createApp(yargs.name as string);
+    if (this.workspace.exists(namespace, name)) {
+      if (!yargs.force) {
+        const answers: Answers = await inquirer.prompt([
+          {
+            name: 'wipeApp',
+            type: 'confirm',
+            message: `An application named '${name}' already exists in namespace '${namespace}'. Continuing will overwrite that. Continue ?`,
+            default: false,
+          },
+        ]);
+
+        if (!answers.wipeApp) {
+          return;
+        }
+      }
+    }
+
+    await this.createApp(namespace, name);
   };
 }
 

@@ -9,13 +9,24 @@ export class WorkspaceManager {
   private readonly path: string;
   constructor(workspacepath: string) {
     this.path = workspacepath;
+    if (!this.exists()) {
+      this.init(false);
+    }
   }
 
   /**
-   * Checks if the workspace folder already exists.
+   * Checks if the workspace folder or the provided app exists.
    */
-  public exists(): boolean {
-    return fsExtra.existsSync(this.path);
+  public exists(namespace?: string, appName?: string): boolean {
+    if (!appName && !namespace) {
+      return fsExtra.existsSync(this.path);
+    }
+
+    if (!appName && namespace) {
+      return fsExtra.existsSync(`${this.path}/${namespace}`);
+    }
+
+    return fsExtra.existsSync(`${this.path}/${namespace}/${appName}.json`);
   }
 
   @Spinner({
