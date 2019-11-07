@@ -58,6 +58,13 @@ export class InMemoryWorkspace implements WorkspaceInterface {
     this.ws[app.getNameSpace()][app.getName()] = app;
   }
 
+  public async list(namespace: string): Promise<string[]> {
+    if (await this.exists(namespace)) {
+      return Object.keys(this.ws[namespace]);
+    }
+    return [];
+  }
+
   @Spinner({
     pre: 'Loading application from the workspace',
     post: 'Application loaded',

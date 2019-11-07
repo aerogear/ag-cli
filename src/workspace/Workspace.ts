@@ -17,6 +17,12 @@ export abstract class Workspace implements WorkspaceInterface {
   public abstract exists(namespace?: string, appName?: string): boolean;
 
   /**
+   * Lists all the applications in a given namespace
+   * @param namespace
+   */
+  public abstract async list(namespace: string): Promise<string[]>;
+
+  /**
    * Saves an the application into the workspace
    * @param app the application to be saved
    */

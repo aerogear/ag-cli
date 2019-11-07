@@ -11,7 +11,7 @@ class PushCommand extends AbstractNamespaceScopedCommand {
   constructor() {
     super(
       'push <appname>',
-      'Pushes all local resources in .ag folder into a namespace',
+      'Pushes an application into a namespace to the cluster',
     );
   }
 

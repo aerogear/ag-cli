@@ -102,6 +102,19 @@ export class FSWorkspace implements WorkspaceInterface {
     await fsExtra.unlink(`${this.path}/${namespace}/${fileName}`);
   }
 
+  public async list(namespace: string): Promise<string[]> {
+    if (await this.exists(namespace)) {
+      const files = await fsExtra.readdir(`${this.path}/${namespace}`);
+      return files.reduce((accumulator: string[], curval: string) => {
+        if (curval.endsWith('.json')) {
+          accumulator.push(curval.substr(0, curval.indexOf('.json')));
+        }
+        return accumulator;
+      }, []);
+    }
+    return [];
+  }
+
   @Spinner({
     pre: 'Loading application from the workspace',
     post: 'Application loaded',

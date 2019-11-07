@@ -88,7 +88,6 @@ class AppDeleteCommand extends AbstractNamespaceScopedCommand {
         return;
       }
     }
-    console.log('going to delete');
     if (yargs.remote || (!yargs.remote && !yargs.local)) {
       await this.remoteDelete(namespace, appName);
     }

@@ -12,8 +12,6 @@ export class AgKubePullCommand extends AbstractKubeCommand {
   }
 
   execute = async (kube: any): Promise<any> => {
-    console.log('pulling3', { name: this.app, namespace: this.namespace });
-
     return await kube.apis['mdc.aerogear.org'].v1alpha1
       .namespace(this.namespace)
       .mobileclient(this.app)
