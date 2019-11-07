@@ -1,14 +1,17 @@
 import * as fsExtra from 'fs-extra';
-import { MobileApp } from '../model/MobileApp';
-import { Spinner } from './spinner';
+import { MobileApp } from '../../model/MobileApp';
+import { Spinner } from '../../utils/spinner';
+import { WorkspaceInterface } from '../WorkspaceInterface';
 
 /**
- * This class is responsible of managin the workspace folder.
+ * Filesystem implementation of the WorkspaceInterface.
+ * Creates a workspace folder ('.ag') into the user home.
  */
-export class WorkspaceManager {
+export class FSWorkspace implements WorkspaceInterface {
   private readonly path: string;
-  constructor(workspacepath: string) {
-    this.path = workspacepath;
+
+  constructor() {
+    this.path = require('os').homedir() + '/.ag';
     if (!this.exists()) {
       this.init(false);
     }
@@ -65,7 +68,7 @@ export class WorkspaceManager {
     post: 'New workspace initialised',
     fail: 'Failed initialising the workspace: %s',
   })
-  public init(overwrite: boolean = false) {
+  private init(overwrite: boolean = false) {
     if (overwrite && this.exists()) {
       this.wipeOutWorkspace();
     }
@@ -92,6 +95,11 @@ export class WorkspaceManager {
         root: e,
       };
     }
+  }
+
+  public async delete(namespace: string, appName: string) {
+    const fileName = appName + '.json';
+    await fsExtra.unlink(`${this.path}/${namespace}/${fileName}`);
   }
 
   @Spinner({
