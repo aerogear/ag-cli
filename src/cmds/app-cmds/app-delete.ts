@@ -29,21 +29,52 @@ class AppDeleteCommand extends AbstractNamespaceScopedCommand {
         describe:
           'if specified, no confirmation will be required before deleting',
         nargs: 0,
+      })
+      .option('local', {
+        alias: 'l',
+        type: 'boolean',
+        describe:
+          "if specified, the application will be deleted only from the workspace (cluster won't be affected)",
+        nargs: 0,
+      })
+      .option('remote', {
+        alias: 'r',
+        type: 'boolean',
+        describe:
+          "if specified, the application will be deleted only from the cluster (the workspace won't be affected)",
+        nargs: 0,
       });
   }
 
   @Spinner({
-    pre: 'Deleting application from the cluster',
-    post: 'Application deleted successfully',
-    fail: 'Error deleting the application from the cluster: %s',
+    pre: 'CLUSTER: Deleting application',
+    post: 'CLUSTER: Application deleted successfully',
+    fail: 'CLUSTER: Unable to delete the application: %s',
     swallow: true,
   })
-  private async delete(namespace: string, appname: string): Promise<void> {
+  private async remoteDelete(
+    namespace: string,
+    appname: string,
+  ): Promise<void> {
     const cl: KubeClient = await KubeClient.getInstance();
     await cl.execute(new AgAppDeleteCommand(appname, namespace));
   }
 
+  @Spinner({
+    pre: 'WORKSPACE: Deleting application',
+    post: 'WORKSPACE: Application deleted successfully',
+    fail: 'WORKSPACE: Unable to delete the application: %s',
+    swallow: true,
+  })
+  private async localDelete(namespace: string, appname: string): Promise<void> {
+    await this.workspace.delete(namespace, appname);
+  }
+
   public handler = async (yargs: Arguments): Promise<void> => {
+    const cl: KubeClient = await KubeClient.getInstance();
+    const appName = yargs.name as string;
+    const namespace = (yargs.namespace as string) || cl.getCurrentNamespace();
+
     if (!yargs.force) {
       const answers: Answers = await inquirer.prompt([
         {
@@ -57,7 +88,13 @@ class AppDeleteCommand extends AbstractNamespaceScopedCommand {
         return;
       }
     }
-    this.delete(yargs.namespace as string, yargs.name as string);
+    if (yargs.remote || (!yargs.remote && !yargs.local)) {
+      await this.remoteDelete(namespace, appName);
+    }
+
+    if (yargs.local || (!yargs.remote && !yargs.local)) {
+      await this.localDelete(namespace, appName);
+    }
   };
 }
 

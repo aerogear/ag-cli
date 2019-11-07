@@ -93,7 +93,10 @@ export function Spinner({ pre, post, fail, swallow }: SpinnerMessage) {
         if (ret && ret.then) {
           // it is a promise
           return ret
-            .then((value: any) => logHandler.post(post))
+            .then((value: any) => {
+              logHandler.post(post);
+              return value;
+            })
             .catch((error: Error) => logHandler.fail(fail, error, !!swallow));
         }
         logHandler.post(post);

@@ -1,7 +1,6 @@
 import { Argv, Arguments } from 'yargs';
-import { WorkspaceManager } from '../utils/WorkspaceManager';
-import { WORKSPACE } from '../global';
 import Module = NodeJS.Module;
+import { Workspace } from '../workspace';
 
 /**
  * Interface to be implemented by all the commands.
@@ -36,12 +35,11 @@ export interface CommandInterface {
 export abstract class AbstractCommand implements CommandInterface {
   readonly name: string;
   readonly desc: string;
-  protected readonly workspace: WorkspaceManager;
+  protected readonly workspace: Workspace = Workspace.getInstance();
 
   protected constructor(name: string, desc: string) {
     this.name = name;
     this.desc = desc;
-    this.workspace = new WorkspaceManager(WORKSPACE);
   }
 
   protected async safeHandler(yargs: Arguments): Promise<void> {}

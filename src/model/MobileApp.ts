@@ -26,10 +26,18 @@ export class MobileApp implements SerializableInterface {
   private readonly name: string;
   private readonly apikey: string;
   private ns: string;
-  constructor(name: string, namespace?: string) {
-    this.name = name;
+
+  constructor(name: string | any, namespace?: string) {
+    if (!namespace) {
+      // we received the definition of the app
+      const appDef = name;
+      this.name = appDef.metadata.name;
+      this.ns = appDef.metadata.namespace;
+    } else {
+      this.name = name;
+      this.ns = namespace;
+    }
     this.apikey = uuid();
-    this.ns = namespace;
   }
 
   getName(): string {
