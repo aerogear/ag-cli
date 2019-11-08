@@ -9,7 +9,7 @@ export async function poll(
   cond: (o: any) => boolean,
   delay: number = 1000,
   timeout: number = 10000,
-  timeoutMessage: string = 'Timeout'
+  timeoutMessage: string = 'Timeout',
 ): Promise<any> {
   const start: number = new Date().getTime();
   let res = await f();
