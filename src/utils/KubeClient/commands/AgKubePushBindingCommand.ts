@@ -12,7 +12,8 @@ export class AgKubePushBindingCommand extends AbstractKubeCommand {
     super();
     this.app = appname;
     this.namespace = namespace || this.getCurrentNamespace();
-    this.conf = conf;
+    console.log({conf});
+    this.conf = JSON.parse(conf);
   }
 
   private async createPushApplication(kube: any, owner: any): Promise<any> {
@@ -41,10 +42,43 @@ export class AgKubePushBindingCommand extends AbstractKubeCommand {
           },
         });
     } catch (error) {
-      // Looks like the push application is not there.
-      // Let's try to create it and then retry this.
       console.log('error', error);
     }
+  }
+
+  private async createAndroidVariant(
+    kube: any,
+    owner: any,
+    pushApp: any,
+    conf: any,
+  ) {
+    const spec = { ...conf };
+    delete spec.variant;
+
+    return await kube.apis['push.aerogear.org'].v1alpha1
+      .namespace(this.namespace)
+      .androidvariant.post({
+        body: {
+          apiVersion: 'push.aerogear.org/v1alpha1',
+          kind: 'AndroidVariant',
+          metadata: {
+            name: `${this.app}-android-ups-variant`,
+            ownerReferences: [{
+                apiVersion: owner.apiVersion,
+                kind: owner.kind,
+                blockOwnerDeletion: false,
+                name: owner.metadata.name,
+                uid: owner.metadata.uid,
+              },
+            ],
+          },
+          spec: {
+            description: 'UPS Android Variant',
+            pushApplicationId: pushApp.body.status.pushApplicationId,
+            ...spec,
+          },
+        },
+      });
   }
 
   private async getPushApplication(kube: any, owner: any): Promise<any> {
@@ -53,10 +87,6 @@ export class AgKubePushBindingCommand extends AbstractKubeCommand {
         .namespace(this.namespace)
         .pushapplication(this.app)
         .get();
-      // if (!(pushApp.body.status && pushApp.body.status.pushApplicationId)) {
-      //   console.log('App is there but is not ready. Retrying....');
-      //   return await this.getPushApplication(kube, owner);
-      // }
       return pushApp;
     } catch (error) {
       // Looks like the push application is not there.
@@ -92,7 +122,8 @@ export class AgKubePushBindingCommand extends AbstractKubeCommand {
       'Timeout waiting for a pushApplicationId to be assigned to the newly created app',
     );
     // We now have the push application. We can now create the variant.
-
-    return pushApp;
+    return await this.createAndroidVariant(kube, mobileApp, pushApp, this.conf);
+    // TODO: we should now update the mobileapp with the new bound services. For the moment we will rely to the MDC
+    // server.js to update it.
   };
 }

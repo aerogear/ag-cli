@@ -43,7 +43,7 @@ class ServiceBindCliCommand extends AbstractNamespaceScopedCommand {
       (yargs.namespace as string) ||
       KubeClient.getInstance().getCurrentNamespace();
     const res = await KubeClient.getInstance().execute(
-      new AgKubePushBindingCommand(namespace, name, ''),
+      new AgKubePushBindingCommand(namespace, name, yargs.conf as string),
     );
     console.log(res);
   };
