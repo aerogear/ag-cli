@@ -1,6 +1,6 @@
 import * as util from 'util';
-import * as ora from 'ora';
 import { Ora } from 'ora';
+import { ora } from './OraSingleton';
 
 /**
  * A log handler will receive the messages and will log them accordingly.
@@ -43,7 +43,7 @@ export interface SpinnerMessage {
 class SpinnerImpl implements SpinnerHandler {
   private static INSTANCE: SpinnerImpl;
 
-  private readonly spinner: Ora = ora();
+  private readonly spinner: Ora = ora;
   private constructor() {}
 
   public static getInstance() {
