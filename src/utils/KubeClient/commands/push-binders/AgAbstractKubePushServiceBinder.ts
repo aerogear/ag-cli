@@ -2,6 +2,7 @@ import { AbstractKubeCommand } from '../AbstractKubeCommand';
 import { poll } from '../../../polling/polling';
 import { KubeClient } from '../../KubeClient';
 import { AgKubePullCommand } from '../AgKubePullCommand';
+import { Notify } from '../Observer';
 
 export abstract class AgAbstractKubePushServiceBinder extends AbstractKubeCommand {
   protected readonly app: string;
@@ -15,6 +16,11 @@ export abstract class AgAbstractKubePushServiceBinder extends AbstractKubeComman
     this.conf = JSON.parse(conf);
   }
 
+  @Notify({
+    pre: 'Pulling mobile app from the cluster',
+    post: 'Mobile app pulled successfully',
+    fail: 'Error pulling mobile app: %s',
+  })
   private async pullMobileApp() {
     try {
       return await KubeClient.getInstance().execute(
@@ -28,6 +34,11 @@ export abstract class AgAbstractKubePushServiceBinder extends AbstractKubeComman
     }
   }
 
+  @Notify({
+    pre: 'Creating new push application',
+    post: 'Push application created successfully',
+    fail: 'Error creating mobile app: %s',
+  })
   private async createPushApplication(kube: any, mobileApp: any): Promise<any> {
     return await kube.apis['push.aerogear.org'].v1alpha1
       .namespace(this.namespace)
@@ -71,6 +82,11 @@ export abstract class AgAbstractKubePushServiceBinder extends AbstractKubeComman
     }
   }
 
+  @Notify({
+    pre: 'Getting push application',
+    post: 'Push application pulled successfully',
+    fail: 'Error getting the push application: %s',
+  })
   private async getPushApplication(kube: any, mobileApp: any): Promise<any> {
     return await poll(
       async () => await this.getOrCreatePushApplication(kube, mobileApp),

@@ -1,5 +1,6 @@
 import { AbstractKubeCommand } from './AbstractKubeCommand';
 import { AgKubePushServiceBinderFactory } from './push-binders/AgKubePushServiceBinderFactory';
+import { Observer } from './Observer';
 
 export class AgKubePushBindingCommand extends AbstractKubeCommand {
   private readonly app: string;
@@ -14,10 +15,16 @@ export class AgKubePushBindingCommand extends AbstractKubeCommand {
   }
 
   execute = async (kube: any): Promise<any> => {
-    return await AgKubePushServiceBinderFactory.create(
+    const delegate = AgKubePushServiceBinderFactory.create(
       this.namespace,
       this.app,
       this.conf,
-    ).execute(kube);
+    );
+
+    this.observers.forEach((observer: Observer) =>
+      delegate.registerObserver(observer),
+    );
+
+    return delegate.execute(kube);
   };
 }
