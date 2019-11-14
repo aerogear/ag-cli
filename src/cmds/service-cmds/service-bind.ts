@@ -84,6 +84,7 @@ class ServiceBindCliCommand extends AbstractNamespaceScopedCommand
           appname,
           JSON.parse(conf),
         );
+        break;
       default:
         throw {
           message: `Unknown service ${service}. Supported services are: push, datasync`,
