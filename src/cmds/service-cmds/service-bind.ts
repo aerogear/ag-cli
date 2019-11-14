@@ -10,6 +10,8 @@ import {
 } from '../../utils/KubeClient/commands/Observer';
 import { ora } from '../../utils/spinner/OraSingleton';
 import { Spinner } from '../../utils/spinner';
+import { AgKubeDataSyncBindingCommand } from '../../utils/KubeClient/commands/AgKubeDataSyncBindingCommand';
+import { AbstractKubeCommand } from '../../utils/KubeClient/commands/AbstractKubeCommand';
 
 /**
  * This class implements the 'app init <appname>' command.
@@ -70,7 +72,24 @@ class ServiceBindCliCommand extends AbstractNamespaceScopedCommand
       }
     }
 
-    const cmd = new AgKubePushBindingCommand(namespace, appname, conf);
+    let cmd: AbstractKubeCommand;
+
+    switch (service) {
+      case 'push':
+        cmd = new AgKubePushBindingCommand(namespace, appname, conf);
+        break;
+      case 'datasync':
+        cmd = new AgKubeDataSyncBindingCommand(
+          namespace,
+          appname,
+          JSON.parse(conf),
+        );
+      default:
+        throw {
+          message: `Unknown service ${service}. Supported services are: push, datasync`,
+        };
+    }
+
     cmd.registerObserver(this);
 
     return await KubeClient.getInstance().execute(cmd);
