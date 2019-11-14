@@ -11,7 +11,7 @@ export class FSWorkspace implements WorkspaceInterface {
   private readonly path: string;
 
   constructor() {
-    this.path = require('os').homedir() + '/.ag';
+    this.path = require('os').homedir() + '/.ag/workspace';
     if (!this.exists()) {
       this.init(false);
     }

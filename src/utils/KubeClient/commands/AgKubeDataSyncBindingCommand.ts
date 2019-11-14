@@ -56,5 +56,5 @@ export class AgKubeDataSyncBindingCommand extends AbstractKubeCommand {
         data: this.conf,
       },
     });
-  }
+  };
 }

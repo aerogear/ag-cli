@@ -10,7 +10,6 @@ import {
 } from '../../utils/KubeClient/commands/Observer';
 import { ora } from '../../utils/spinner/OraSingleton';
 import { Spinner } from '../../utils/spinner';
-import { KubeCommand } from '../../utils/KubeClient/KubeClient';
 import { AgKubeDataSyncBindingCommand } from '../../utils/KubeClient/commands/AgKubeDataSyncBindingCommand';
 import { AbstractKubeCommand } from '../../utils/KubeClient/commands/AbstractKubeCommand';
 
@@ -85,6 +84,10 @@ class ServiceBindCliCommand extends AbstractNamespaceScopedCommand
           appname,
           JSON.parse(conf),
         );
+      default:
+        throw {
+          message: `Unknown service ${service}. Supported services are: push, datasync`,
+        };
     }
 
     cmd.registerObserver(this);
