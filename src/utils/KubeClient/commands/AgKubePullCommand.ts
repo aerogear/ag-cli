@@ -1,5 +1,4 @@
 import { AbstractKubeCommand } from './AbstractKubeCommand';
-import { MobileApp } from '../../../model/MobileApp';
 
 export class AgKubePullCommand extends AbstractKubeCommand {
   private readonly app: string;
