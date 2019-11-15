@@ -1,5 +1,4 @@
 import * as util from 'util';
-import { Ora } from 'ora';
 import { ora } from './OraSingleton';
 
 /**
@@ -43,7 +42,7 @@ export interface SpinnerMessage {
 class SpinnerImpl implements SpinnerHandler {
   private static INSTANCE: SpinnerImpl;
 
-  private readonly spinner: Ora = ora;
+  private readonly spinner: any = ora;
   private constructor() {}
 
   public static getInstance() {
@@ -61,7 +60,7 @@ class SpinnerImpl implements SpinnerHandler {
   };
   fail = (msg: string, error: Error, swallow: boolean = false): void => {
     // check if the exception has already been logged: if it is, the spinner is stopped.
-    if (this.spinner.isSpinning) {
+    if (!this.spinner.isFailed()) {
       this.spinner.fail(util.format(msg, error.message));
     }
     if (!swallow) {
