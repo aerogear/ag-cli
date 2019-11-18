@@ -6,10 +6,16 @@ export const conf: ValidatorConfig = {
       fields: {
         syncServerUrl: [
           {
+            type: 'REQUIRED',
+          },
+          {
             type: 'VALID_URL',
           },
         ],
         graphqlEndpoint: [
+          {
+            type: 'REQUIRED',
+          },
           {
             type: 'VALID_URL_PATH',
           },

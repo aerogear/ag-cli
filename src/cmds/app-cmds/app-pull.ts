@@ -31,7 +31,7 @@ class AppPullCommand extends AbstractNamespaceScopedCommand {
     const cl: KubeClient = await KubeClient.getInstance();
     const res = await cl.execute(new AgKubePullCommand(appname, namespace));
     // FIXME: check that the status code (res.statusCode) is 200
-    await this.workspace.save(new MobileApp(res.body));
+    await this.workspace.save(new MobileApp(res));
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {

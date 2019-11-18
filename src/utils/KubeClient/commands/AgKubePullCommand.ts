@@ -11,9 +11,10 @@ export class AgKubePullCommand extends AbstractKubeCommand {
   }
 
   execute = async (kube: any): Promise<any> => {
-    return await kube.apis['mdc.aerogear.org'].v1alpha1
+    // FIXME: check return value
+    return (await kube.apis['mdc.aerogear.org'].v1alpha1
       .namespace(this.namespace)
       .mobileclient(this.app)
-      .get();
+      .get()).body;
   };
 }

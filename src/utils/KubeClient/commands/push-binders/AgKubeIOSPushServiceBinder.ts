@@ -10,6 +10,8 @@ export class AgKubeIOSPushServiceBinder extends AgAbstractKubePushServiceBinder 
     const spec = { ...conf };
     delete spec.variant;
 
+    spec.production = spec.production === true || spec.production === 'true';
+
     return await kube.apis['push.aerogear.org'].v1alpha1
       .namespace(this.namespace)
       .iosvariant.post({

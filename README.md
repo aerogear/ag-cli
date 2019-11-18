@@ -34,6 +34,8 @@ Running tests:
 $ npm test
 ```
 
+Futher documentation can be found [here](./docs)
+
 ## License
 
 This software is licensed under Apache 2.0, see the "LICENSE" file for a full description of its terms.

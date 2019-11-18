@@ -85,6 +85,7 @@ export class FSWorkspace implements WorkspaceInterface {
     const fileName = app.getName() + '.json';
     try {
       await fsExtra.mkdirp(`${this.path}/${app.getNameSpace()}`);
+      const appJson = app.toJson();
       await fsExtra.outputJson(
         `${this.path}/${app.getNameSpace()}/${fileName}`,
         app.toJson(),
@@ -127,6 +128,6 @@ export class FSWorkspace implements WorkspaceInterface {
     const appJson = await fsExtra.readJSON(
       `${this.path}/${namespace}/${appName}.json`,
     );
-    return new MobileApp(appJson.metadata.name, appJson.status.namespace);
+    return new MobileApp(appJson).namespace(namespace);
   }
 }

@@ -12,6 +12,7 @@ import { ora } from '../../utils/spinner/OraSingleton';
 import { Spinner } from '../../utils/spinner';
 import { AgKubeDataSyncBindingCommand } from '../../utils/KubeClient/commands/AgKubeDataSyncBindingCommand';
 import { AbstractKubeCommand } from '../../utils/KubeClient/commands/AbstractKubeCommand';
+import { Workspace } from '../../workspace';
 
 /**
  * This class implements the 'app init <appname>' command.
@@ -72,28 +73,36 @@ class ServiceBindCliCommand extends AbstractNamespaceScopedCommand
       }
     }
 
-    let cmd: AbstractKubeCommand;
+    const mobileApp = await Workspace.getInstance().loadApplication(
+      namespace,
+      appname,
+    );
+    mobileApp.addService(service, JSON.parse(conf));
 
-    switch (service) {
-      case 'push':
-        cmd = new AgKubePushBindingCommand(namespace, appname, conf);
-        break;
-      case 'datasync':
-        cmd = new AgKubeDataSyncBindingCommand(
-          namespace,
-          appname,
-          JSON.parse(conf),
-        );
-        break;
-      default:
-        throw {
-          message: `Unknown service ${service}. Supported services are: push, datasync`,
-        };
-    }
+    await Workspace.getInstance().save(mobileApp);
 
-    cmd.registerObserver(this);
-
-    return await KubeClient.getInstance().execute(cmd);
+    // let cmd: AbstractKubeCommand;
+    //
+    // switch (service) {
+    //   case 'push':
+    //     cmd = new AgKubePushBindingCommand(namespace, appname, conf);
+    //     break;
+    //   case 'datasync':
+    //     cmd = new AgKubeDataSyncBindingCommand(
+    //       namespace,
+    //       appname,
+    //       JSON.parse(conf),
+    //     );
+    //     break;
+    //   default:
+    //     throw {
+    //       message: `Unknown service ${service}. Supported services are: push, datasync`,
+    //     };
+    // }
+    //
+    // cmd.registerObserver(this);
+    //
+    // return await KubeClient.getInstance().execute(cmd);
   }
 
   public handler = async (yargs: Arguments): Promise<void> => {

@@ -9,7 +9,7 @@
     "figlet": "1.2.4",
     "fs-extra": "8.1.0",
     "inquirer": "7.0.0",
-    "json-data-validator": "^0.3.2",
+    "json-data-validator": "^0.3.3",
     "kubernetes-client": "8.3.4",
     "ora": "3.4.0",
     "uuid": "3.3.3",

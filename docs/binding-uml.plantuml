@@ -1,0 +1,17 @@
+@startuml
+title Local Service Binding (Workspace)
+autonumber
+actor User
+participant "Ag CLI" as AgCLI
+participant "service-bind" as servicebind
+User -> AgCLI: Bind Service
+AgCLI -> servicebind: bindService(service)
+servicebind -> validatorFactory: create(service)
+validatorFactory -> servicebind: Validator
+servicebind -> Validator: validate(conf)
+servicebind -> MobileApp: addBinding(service, conf)
+servicebind -> Workspace: getInstance()
+Workspace -> servicebind: Workspace [FSWorkspace]
+servicebind -> Workspace: save(MobileApp)
+AgCLI -> User: Service bound
+@enduml
