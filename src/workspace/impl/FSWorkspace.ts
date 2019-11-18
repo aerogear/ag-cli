@@ -86,7 +86,6 @@ export class FSWorkspace implements WorkspaceInterface {
     try {
       await fsExtra.mkdirp(`${this.path}/${app.getNameSpace()}`);
       const appJson = app.toJson();
-      console.log('saving: ', appJson);
       await fsExtra.outputJson(
         `${this.path}/${app.getNameSpace()}/${fileName}`,
         app.toJson(),
