@@ -106,7 +106,7 @@ export abstract class AgAbstractKubePushServiceBinder extends AbstractKubeComman
   ): Promise<any>;
 
   execute = async (kube: any): Promise<any> => {
-    const mobileApp = (await this.pullMobileApp());
+    const mobileApp = await this.pullMobileApp();
     const pushApp = await this.getPushApplication(kube, mobileApp);
     // We now have the push application. We can now create the variant.
     return await this.createVariant(kube, mobileApp, pushApp, this.conf);

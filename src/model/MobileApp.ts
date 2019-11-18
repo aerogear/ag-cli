@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { SerializableInterface } from './SerializableInterface';
-import {PushServiceConfigMgr} from "./servicemgr/PushServiceConfigMgr";
-import {GenericServiceConfigMgr} from "./servicemgr/GenericServiceConfigMgr";
+import { PushServiceConfigMgr } from './servicemgr/PushServiceConfigMgr';
+import { GenericServiceConfigMgr } from './servicemgr/GenericServiceConfigMgr';
 
 /**
  * Interface representing the Kubernetes Mobile App Custom Resource Definition.
@@ -28,7 +28,7 @@ export class MobileApp implements SerializableInterface {
   private readonly name: string;
   private readonly apikey: string;
   private ns: string;
-  private services: any = [];
+  private readonly services: any = [];
 
   constructor(name: string | any, namespace?: string) {
     if (!namespace) {
