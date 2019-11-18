@@ -1,0 +1,16 @@
+@startuml
+title Binding push services (Remote)
+autonumber
+actor User
+User -> AgCLI: Push changes
+AgCLI -> push: pushApp(service)
+push -> push: loop services
+push -> KubeClient: getInstance()
+KubeClient -> push: KubeClient
+push -> KubeClient: execute(new AgKubePushBindingCommand(conf))
+KubeClient -> AgKubePushBindingCommand: execute(kube, conf)
+AgKubePushBindingCommand -> AgKubePushServiceBinderFactory: create(conf)
+AgKubePushServiceBinderFactory -> AgKubePushBindingCommand: instance of AgAbstractKubePushServiceBinder
+AgKubePushBindingCommand -> AgAbstractKubePushServiceBinder: execute(kube, conf)
+push -> User: changes pushed
+@enduml

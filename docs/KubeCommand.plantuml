@@ -1,0 +1,36 @@
+@startuml
+interface KubeCommand {
+  +execute(kube)
+}
+class KubeClient {
+    +getInstance()
+    +getCurrentNamespace()
+    +execute( cmd: KubeCommand )
+}
+
+class AgKubePushServiceBinderFactory {
+  +{static}create(namespace, appName, serviceConf)
+}
+
+abstract class AgAbstractKubePushServiceBinder {
+    #{abstract}createVariant()
+}
+
+abstract class AbstractKubeCommand {
+    {abstract} +async execute(kube);
+}
+
+KubeCommand <.. KubeClient
+
+KubeCommand <|-- AbstractKubeCommand
+AbstractKubeCommand <|-- AgKubePullCommand
+AbstractKubeCommand <|-- AgKubePushBindingCommand
+AbstractKubeCommand <|-- AppDeleteCommand
+AbstractKubeCommand <|-- AppListCommand
+AbstractKubeCommand <|-- AppPushCommand
+AbstractKubeCommand <|-- AgAbstractKubePushServiceBinder
+AgAbstractKubePushServiceBinder <|-- AgKubeAndroidPushServiceBinder
+AgAbstractKubePushServiceBinder <|-- AgKubeIOSPushServiceBinder
+AgAbstractKubePushServiceBinder <.. AgKubePushServiceBinderFactory
+AgKubePushBindingCommand --o "uses" AgKubePushServiceBinderFactory
+@enduml

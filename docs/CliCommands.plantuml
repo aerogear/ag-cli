@@ -1,0 +1,13 @@
+@startuml
+interface CommandInterface {
+  +handler(yargs: Argument)
+  +builder(yargs: Argv)
+}
+abstract class AbstractCommand
+abstract class AbstractNamespaceScopedCommand {
+  +initCli(yargs: Argv): Argv
+}
+
+CommandInterface <|-- AbstractCommand
+AbstractCommand <|-- AbstractNamespaceScopedCommand
+@enduml
